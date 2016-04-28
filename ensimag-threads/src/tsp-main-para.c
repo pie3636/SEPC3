@@ -17,6 +17,8 @@
 #include "tsp-lp.h"
 #include "tsp-hkbound.h"
 
+#include "pthread.h"
+
 
 /* macro de mesure de temps, retourne une valeur en nanosecondes */
 #define TIME_DIFF(t1, t2) \
@@ -40,6 +42,11 @@ bool affiche_sol= false;
 bool affiche_progress=false;
 bool quiet=false;
 
+pthread_mutex_t mtxSol;	// Erik
+pthread_mutex_t mtxCut;	// Erik
+pthread_mutex_t mtxJob;	// Erik
+int countThread = 0;
+
 static void generate_tsp_jobs (struct tsp_queue *q, int hops, int len, uint64_t vpres, tsp_path_t path, long long int *cuts, tsp_path_t sol, int *sol_len, int depth)
 {
     if (len >= minimum) {
@@ -49,7 +56,10 @@ static void generate_tsp_jobs (struct tsp_queue *q, int hops, int len, uint64_t 
     
     if (hops == depth) {
         /* On enregistre du travail à faire plus tard... */
+	pthread_mutex_lock(&mtxJob);			// Erik
       add_job (q, path, hops, len, vpres);
+	//pthread_t countThread;
+	pthread_mutex_unlock(&mtxJob);			// Erik
     } else {
         int me = path [hops - 1];        
         for (int i = 0; i < nb_towns; i++) {
@@ -71,6 +81,9 @@ static void usage(const char *name) {
 
 int main (int argc, char **argv)
 {
+
+	pthread_mutex_init(&mtxSol, NULL); 	// Erik
+
     unsigned long long perf;
     tsp_path_t path;
     uint64_t vpres=0;
@@ -131,9 +144,12 @@ int main (int argc, char **argv)
     tsp_path_t solution;
     memset (solution, -1, MAX_TOWNS * sizeof (int));
     solution[0] = 0;
-    while (!empty_queue (&q)) {
+    while (!empty_queue (&q)) {	
         int hops = 0, len = 0;
+
+	pthread_mutex_lock(&mtxJob);			// Erik
         get_job (&q, solution, &hops, &len, &vpres);
+	pthread_mutex_unlock(&mtxJob);			// Erik
 	
 	// le noeud est moins bon que la solution courante
 	if (minimum < INT_MAX
