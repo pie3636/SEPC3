@@ -4,8 +4,8 @@
 /* nombre de villes */
 extern int nb_towns;
 typedef struct {
-  int x, y ;
-} coor_t ;
+	int x, y;
+} coor_t;
 
 typedef coor_t *coortab_t;
 coortab_t towns;
@@ -13,5 +13,5 @@ coortab_t towns;
 extern int *cutprefix;
 
 /* initialisation du tableau des distances */
-void genmap ();
+void genmap();
 #endif

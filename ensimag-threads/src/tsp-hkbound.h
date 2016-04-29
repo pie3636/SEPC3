@@ -10,9 +10,7 @@ extern "C" {
 
 #include "tsp-types.h"
 
-  
-  int lower_bound_using_hk(tsp_path_t path, int hops, int len, uint64_t vpres);
-
+int lower_bound_using_hk(tsp_path_t path, int hops, int len, uint64_t vpres);
 
 #ifdef __cplusplus
 }
