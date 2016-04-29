@@ -119,6 +119,7 @@ void *tsp2(void *args) {
 			}
 		}
 	}
+	
 	pthread_mutex_lock(&mtxMinCut);
 	if (localMin < minimum && steps != 0) {
 		*solution_len = localSolution_len;
